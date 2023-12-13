@@ -53,6 +53,12 @@ Implemented minimal basic console app with business logic. Nothing fancy here.
 * Added `LoanApplicationAppliedHandler` which subscribes to `LoanApplicationAppliedEvent` for updating loan metrics summary.
 * Added `LoanMetricsSummaryUpdatedEvent` which is published when loan metrics summary is updated.
 * Added `LoanMetricsSummaryUpdatedConsoleLogHandler` which subscribes to `LoanMetricsSummaryUpdatedEvent` for reporting/printing loan metrics summary on the console.
+* Added experimental `LoanApplicationAppliedCounterCollectionHandler` which subscribes to `LoanApplicationAppliedEvent` to expose some custom dotnet counters.
+    * To use this counters, open another command line terminal and navigate to the root folder of this repository.
+    * Install dotnet-counters if not already installed by runing below command.
+        * `dotnet tool install dotnet-counters`
+    * Monitor the counters by running below command.
+        * `dotnet dotnet-counters monitor -n LendingPlatform LoanApplicationMetrics`
 
 -------------------------------------------------
 

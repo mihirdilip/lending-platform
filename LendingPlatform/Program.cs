@@ -27,7 +27,8 @@ hostBuilder.Services.AddSingleton<ILoanApplicationRepository, LoanApplicationJso
                     .AddTransient<ILoanApplicationValidator, DefaultLoanApplicationValidator>()
                     .AddTransient<ILoanApplicationWriter, LoanApplicationWriterForConsole>();
 
-hostBuilder.Services.AddSingleton<ILoanMetricsRepository, LoanMetricsJsonFileRepository>();
+hostBuilder.Services.AddSingleton<ILoanMetricsRepository, LoanMetricsJsonFileRepository>()
+                    .AddSingleton<DotNetCounterManager>();
 
 hostBuilder.Services.AddMediatR(o => o.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
