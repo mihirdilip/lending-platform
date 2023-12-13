@@ -4,8 +4,6 @@
     * Would add trivial validations for input values.
 * Assuming total loan value metric is calculated only for successful applications.
 * Assuming mean average Loan to Value metric is calculated only for successful applications.
-* Collection of input values, validation logic, logic to calculate metrics and, printing of the metrics 
-    * Each of this can be extracted out to a method or a separate class to follow SOLID principles and make code more it more testable.
 * We can emulate persistence of loan applications and summary data by saving it to a local json file. 
     * This can be SQL/NOSQL database in production.
 * We can introduce IoC and use dependency injections.
@@ -16,7 +14,24 @@
 * Use clean architechture principles for organising the code structure if this service needs expose more features.
 * Have metrics collected by some telemetry platform like Azure App Insights/Monitor, Grafana, Prometheus, etc.
 * Add comments for all the classes, properties, methods, etc.
+* Use Pull Requests and CI validations before merging into main branch.
 * Convert the console app into micro-service / rest api and host it on some cloud service like azure api app, AKS, depending on the requirements.
+
+## Phase 1
+[Phase 1 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-1)
+
+Implemented minimal basic console app with business logic. Nothing fancy here.
+
+## Phase 2
+[Phase 2 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-2)
+
+* Extracted collection of input values into a method.
+* Added `LoanApplicationRequest` class to hold input values and pass to other methods/classes.
+* Extracted validation logic to `DefaultLoanApplicationValidator` class implementing `ILoanApplicationValidator` interface. 
+* Extracted code to run validation, logic to calculate metrics and printing of the metrics to `LoanApplicationWriterForConsole` class implementing `ILoanApplicationWriter` interface.
+* Added a test project for testing the validation logic.
+
+
 
 -------------------------------------------------
 
@@ -44,6 +59,3 @@ Build a simple Console application using the technology of your choice (preferab
     * If the LTV is less than 80%, the credit score of the applicant must be 800 or more
     * If the LTV is less than 90%, the credit score of the applicant must be 900 or more
     * If the LTV is 90% or more, the application must be declined
-
-## Submission
-Send through a public link to your GIT repository prior to interview.
