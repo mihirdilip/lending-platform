@@ -32,11 +32,13 @@
 
             // Below error messages can be extracted into string contants and/or resource strings for multi language support.
 
+            ArgumentNullException.ThrowIfNull(request);
+
             if (request.LoanAmount < 100000 || request.LoanAmount > 1500000)
                 throw new LoanApplicationException("The value of the loan must be between £100,000 and £1,500,000.");
 
             if (request.AssetValue < 100000)
-                throw new LoanApplicationException("The value of the asset must be at least £100,000.");
+                throw new LoanApplicationException($"The value of the asset must be greater than loan amount ({request.LoanAmount:C}).");
 
             if (request.CreditScore < 1 || request.CreditScore > 999)
                 throw new LoanApplicationException("The credit score of the applicant must be between 1 and 999.");

@@ -1,4 +1,5 @@
-﻿using LendingPlatform.LoanMetrics;
+﻿using LendingPlatform.Events;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace LendingPlatform.LoanApplication
@@ -11,34 +12,29 @@ namespace LendingPlatform.LoanApplication
     internal class LoanApplicationWriterForConsole : ILoanApplicationWriter
     {
         private readonly ILogger<LoanApplicationWriterForConsole> _logger;
+        private readonly IMediator _mediator;
         private readonly ILoanApplicationValidator _validator;
-        private readonly ILoanApplicationRepository _applicationRepository;
-        private readonly ILoanMetricsRepository _metricsRepository;
+        private readonly ILoanApplicationRepository _repository;
 
-        public LoanApplicationWriterForConsole(ILogger<LoanApplicationWriterForConsole> logger, ILoanApplicationValidator validator, ILoanApplicationRepository applicationRepository, ILoanMetricsRepository metricsRepository)
+        public LoanApplicationWriterForConsole(ILogger<LoanApplicationWriterForConsole> logger, IMediator mediator, ILoanApplicationValidator validator, ILoanApplicationRepository repository)
         {
             _logger = logger;
+            _mediator = mediator;
             _validator = validator;
-            _applicationRepository = applicationRepository;
-            _metricsRepository = metricsRepository;
+            _repository = repository;
         }
 
         public async Task<LoanApplicationResult> ApplyAsync(LoanApplicationRequest request, CancellationToken cancellationToken)
         {
             var result = new LoanApplicationResult(request);
-            var metricsSummary = await _metricsRepository.GetSummaryAsync(cancellationToken) ?? new LoanMetricsSummary();
+
             try
             {
                 await _validator.ValidateAsync(request, CancellationToken.None);
-
-                metricsSummary.TotalApplicationsAccepted++;
-                metricsSummary.TotalAcceptedLoanAmount += request.LoanAmount;
-                metricsSummary.TotalAcceptedLoanToValueInPercentage += request.LoanToValuePercentage;
             }
             catch (LoanApplicationException ex)
             {
                 result.SetFailed(ex.Message, ex);
-                metricsSummary.TotalApplicationsDeclined++;
                 _logger.LogTrace(ex, ex.Message);
             }
             catch (Exception ex)
@@ -47,20 +43,18 @@ namespace LendingPlatform.LoanApplication
                 _logger.LogError(ex, ex.Message);
             }
 
+            Console.WriteLine(result.ToString());
+            Console.WriteLine();
+
             try
             {
-                await _applicationRepository.SaveAsync(result, cancellationToken);
-                await _metricsRepository.SaveSummaryAsync(metricsSummary, cancellationToken);
+                await _repository.SaveAsync(result, cancellationToken);
+                await _mediator.Publish(new LoanApplicationAppliedEvent(result), cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
             }
-
-            Console.WriteLine(result.ToString());
-            Console.WriteLine();
-            Console.WriteLine(metricsSummary.ToString());
-            Console.WriteLine();
 
             return result;
         }

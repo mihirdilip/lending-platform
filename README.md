@@ -6,9 +6,9 @@
 * Assuming mean average Loan to Value metric is calculated only for successful applications.
 * Emulating persistence of loan applications and summary data by saving them to local json files. 
     * This can be SQL/NOSQL database in production.
-* We can introduce pub-sub messaging of events to make things loosely coupled can scalable. 
-    * Collection & reporting of metrics can be refactored to use this. 
-    * This can be in memory for now but can be over the network using Azure Service Bus or something similar.
+* Using pub-sub messaging of events to make things loosely coupled and scalable. 
+    * Collection & reporting of loan metrics summary is utilising this. 
+    * This is in memory for now but can be over the network using Azure Service Bus or something similar.
 * Add unit tests and integration tests as required.
 * Use clean architechture principles for organising the code structure if this service needs expose more features.
 * Have metrics collected by some telemetry platform like Azure App Insights/Monitor, Grafana, Prometheus, etc.
@@ -40,6 +40,19 @@ Implemented minimal basic console app with business logic. Nothing fancy here.
     * `LoanMetricsJsonFileRepository` class implementing `ILoanMetricsRepository` interface and a supporting class `LoanMetricsSummary`.
     * This can be SQL/NOSQL database in production.
 * Introduced IoC and using DI.
+
+
+## Phase 4
+[Phase 4 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-4)
+
+* Added LoanApplication & LoanMetrics folders and moved relavent files.
+* Added in-memory pub-sub messaging using MediatR to make things event driven, loosely coupled and scalable.
+    * This can be over the network using Azure Service Bus or something similar.
+* Added abstract `DomainEvent` class implementing `IDomainEvent` interface.
+* Added `LoanApplicationAppliedEvent` which is published when loan application is submitted.
+* Added `LoanApplicationAppliedHandler` which subscribes to `LoanApplicationAppliedEvent` for updating loan metrics summary.
+* Added `LoanMetricsSummaryUpdatedEvent` which is published when loan metrics summary is updated.
+* Added `LoanMetricsSummaryUpdatedConsoleLogHandler` which subscribes to `LoanMetricsSummaryUpdatedEvent` for reporting/printing loan metrics summary on the console.
 
 -------------------------------------------------
 

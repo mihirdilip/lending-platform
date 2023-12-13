@@ -10,9 +10,9 @@ using Microsoft.Extensions.Hosting;
  * Assuming mean average Loan to Value metric is calculated only for successful applications.
  * Emulating persistence of loan applications and summary data by saving them to local json files.
  *      This can be SQL/NOSQL database in production.
- * We can introduce pub-sub messaging of events to make things loosely coupled can scalable.
- *      Collection & reporting of metrics can be refactored to use this. 
- *      This can be in memory for now but can be over the network using Azure Service Bus or something similar.
+ * Using pub-sub messaging of events to make things loosely coupled and scalable. 
+ *      Collection & reporting of loan metrics summary is utilising this. 
+ *      This is in memory for now but can be over the network using Azure Service Bus or something similar.
  * Add unit tests and integration tests as required.
  * Use clean architechture principles for organising the code structure if this service needs expose more features.
  * Have metrics collected by some telemetry platform like Azure App Insights/Monitor, Grafana, Prometheus, etc.
@@ -29,14 +29,17 @@ hostBuilder.Services.AddSingleton<ILoanApplicationRepository, LoanApplicationJso
 
 hostBuilder.Services.AddSingleton<ILoanMetricsRepository, LoanMetricsJsonFileRepository>();
 
+hostBuilder.Services.AddMediatR(o => o.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 using IHost host = hostBuilder.Build();
 await StartAppAsync(host.Services);
 await host.RunAsync();
 
 
-
-
-static async Task StartAppAsync(IServiceProvider services)
+/*
+ * The below methods can be moved to a separate class to keep things simple.
+ */
+ static async Task StartAppAsync(IServiceProvider services)
 {
     var loanApplicationWriter = services.GetRequiredService<ILoanApplicationWriter>();
 
