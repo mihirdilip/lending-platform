@@ -2,55 +2,61 @@
 {
     internal interface ILoanApplicationWriter
     {
-        public Task ApplyAsync(LoanApplicationRequest request, CancellationToken cancellation);
+        public Task<LoanApplicationResult> ApplyAsync(LoanApplicationRequest request, CancellationToken cancellationToken);
     }
 
     internal class LoanApplicationWriterForConsole : ILoanApplicationWriter
     {
-        public static int _totalApplicationsAccepted = 0;
-        public static int _totalApplicationsDeclined = 0;
-        public static decimal _totalLoanAmount = 0;
-        public static decimal _totalLoanToValue = 0;
-
         private readonly ILoanApplicationValidator _validator;
+        private readonly ILoanApplicationRepository _applicationRepository;
+        private readonly ILoanMetricsRepository _metricsRepository;
 
-        public LoanApplicationWriterForConsole(ILoanApplicationValidator validator)
+        public LoanApplicationWriterForConsole(ILoanApplicationValidator validator, ILoanApplicationRepository applicationRepository, ILoanMetricsRepository metricsRepository)
         {
             _validator = validator;
+            _applicationRepository = applicationRepository;
+            _metricsRepository = metricsRepository;
         }
 
-        public async Task ApplyAsync(LoanApplicationRequest request, CancellationToken cancellation)
+        public async Task<LoanApplicationResult> ApplyAsync(LoanApplicationRequest request, CancellationToken cancellationToken)
         {
+            var result = new LoanApplicationResult(request);
+            var metricsSummary = await _metricsRepository.GetSummaryAsync(cancellationToken) ?? new LoanMetricsSummary();
             try
             {
                 await _validator.ValidateAsync(request, CancellationToken.None);
 
-                Console.WriteLine("Loan application was successful");
-                _totalApplicationsAccepted++;
-                _totalLoanAmount += request.LoanAmount;
-                _totalLoanToValue += request.LoanToValuePercentage;
+                metricsSummary.TotalApplicationsAccepted++;
+                metricsSummary.TotalAcceptedLoanAmount += request.LoanAmount;
+                metricsSummary.TotalAcceptedLoanToValueInPercentage += request.LoanToValuePercentage;
             }
             catch (LoanApplicationException ex)
             {
-                Console.WriteLine("Loan application was unsuccessful");
-                Console.WriteLine("Reason: " + ex.Message);
-                _totalApplicationsDeclined++;
+                result.SetFailed(ex.Message, ex);
+                metricsSummary.TotalApplicationsDeclined++;
             }
             catch (Exception ex)
             {
+                result.SetFailed(ex.Message, ex);
                 Console.WriteLine("UNKNOWN ERROR: " + ex.Message);
             }
 
-            var meanLTV = _totalApplicationsAccepted > 0 ? _totalLoanToValue / _totalApplicationsAccepted : 0;
+            try
+            {
+                await _applicationRepository.SaveAsync(result, cancellationToken);
+                await _metricsRepository.SaveSummaryAsync(metricsSummary, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error when trying to save: " + ex.Message);
+            }
 
+            Console.WriteLine(result.ToString());
             Console.WriteLine();
-            Console.WriteLine("Metrics Summary, ");
-            Console.WriteLine($"Total declined applications: {_totalApplicationsDeclined}");
-            Console.WriteLine($"Total accepted applications: {_totalApplicationsAccepted}");
-            Console.WriteLine($"Total value of accepted loans: {_totalLoanAmount:C}");
-            Console.WriteLine($"Mean average Loan to Value for accepted loans: {meanLTV:0.##}%");
+            Console.WriteLine(metricsSummary.ToString());
+            Console.WriteLine();
 
-            Console.WriteLine();
+            return result;
         }
     }
 }

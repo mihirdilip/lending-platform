@@ -6,7 +6,7 @@ using LendingPlatform;
  *      Would add trivial validations for input values.
  * Assuming total loan value metric is calculated only for successful applications.
  * Assuming mean average Loan to Value metric is calculated only for successful applications.
- * We can emulate persistence of loan applications and summary data by saving it to a local json file. 
+ * Emulating persistence of loan applications and summary data by saving them to local json files.
  *      This can be SQL/NOSQL database in production.
  * We can introduce IoC and use dependency injections.
  * We can introduce pub-sub messaging of events to make things loosely coupled can scalable.
@@ -22,14 +22,17 @@ using LendingPlatform;
 
 Console.WriteLine("Welcome to the Lending Platform!");
 
-var loanWriter = new LoanApplicationWriterForConsole(new DefaultLoanApplicationValidator());
+var loanWriter = new LoanApplicationWriterForConsole(
+    new DefaultLoanApplicationValidator(), 
+    new LoanApplicationJsonFileRepository(),
+    new LoanMetricsJsonFileRepository());
 
 while (true)
 {
     Console.WriteLine();
     Console.WriteLine("------------------------------------------");
 
-    await loanWriter.ApplyAsync(GetUserInput(), CancellationToken.None);
+    _ = await loanWriter.ApplyAsync(GetUserInput(), CancellationToken.None);
 
     Console.WriteLine("------------------------------------------");
     Console.WriteLine();

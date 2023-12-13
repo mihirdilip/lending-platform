@@ -4,7 +4,7 @@
     * Would add trivial validations for input values.
 * Assuming total loan value metric is calculated only for successful applications.
 * Assuming mean average Loan to Value metric is calculated only for successful applications.
-* We can emulate persistence of loan applications and summary data by saving it to a local json file. 
+* Emulating persistence of loan applications and summary data by saving them to local json files. 
     * This can be SQL/NOSQL database in production.
 * We can introduce IoC and use dependency injections.
 * We can introduce pub-sub messaging of events to make things loosely coupled can scalable. 
@@ -22,6 +22,7 @@
 
 Implemented minimal basic console app with business logic. Nothing fancy here.
 
+
 ## Phase 2
 [Phase 2 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-2)
 
@@ -32,6 +33,13 @@ Implemented minimal basic console app with business logic. Nothing fancy here.
 * Added a test project for testing the validation logic.
 
 
+## Phase 3
+[Phase 3 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-3)
+
+* Added below repositories to emulate persistence of loan applications and summary data by saving them to local json files.  
+    * `LoanApplicationJsonFileRepository` class implementing `ILoanApplicationRepository` interface and a supporting class `LoanApplicationResult`.
+    * `LoanMetricsJsonFileRepository` class implementing `ILoanMetricsRepository` interface and a supporting class `LoanMetricsSummary`.
+    * This can be SQL/NOSQL database in production.
 
 -------------------------------------------------
 
