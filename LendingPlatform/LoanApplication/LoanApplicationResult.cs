@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LendingPlatform
+namespace LendingPlatform.LoanApplication
 {
     internal class LoanApplicationResult
     {

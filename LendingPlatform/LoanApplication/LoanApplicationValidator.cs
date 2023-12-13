@@ -1,4 +1,4 @@
-﻿namespace LendingPlatform
+﻿namespace LendingPlatform.LoanApplication
 {
     internal interface ILoanApplicationValidator
     {

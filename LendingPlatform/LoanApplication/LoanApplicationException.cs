@@ -1,4 +1,4 @@
-﻿namespace LendingPlatform
+﻿namespace LendingPlatform.LoanApplication
 {
     [Serializable]
     internal class LoanApplicationException : Exception

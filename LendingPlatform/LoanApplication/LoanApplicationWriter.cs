@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using LendingPlatform.LoanMetrics;
+using Microsoft.Extensions.Logging;
 
-namespace LendingPlatform
+namespace LendingPlatform.LoanApplication
 {
     internal interface ILoanApplicationWriter
     {

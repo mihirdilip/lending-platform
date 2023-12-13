@@ -1,4 +1,4 @@
-﻿namespace LendingPlatform
+﻿namespace LendingPlatform.LoanMetrics
 {
     internal class LoanMetricsSummary
     {

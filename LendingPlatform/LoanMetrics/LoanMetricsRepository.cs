@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace LendingPlatform
+namespace LendingPlatform.LoanMetrics
 {
     internal interface ILoanMetricsRepository
     {

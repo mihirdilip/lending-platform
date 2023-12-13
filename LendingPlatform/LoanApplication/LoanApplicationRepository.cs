@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
 
-namespace LendingPlatform
+namespace LendingPlatform.LoanApplication
 {
     internal interface ILoanApplicationRepository
     {

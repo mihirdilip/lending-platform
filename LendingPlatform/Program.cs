@@ -1,7 +1,7 @@
-﻿using LendingPlatform;
+﻿using LendingPlatform.LoanApplication;
+using LendingPlatform.LoanMetrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Globalization;
 
 /*
  * Assuming that the input values will be of correct format. 

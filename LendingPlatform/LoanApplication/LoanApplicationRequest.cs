@@ -1,4 +1,4 @@
-﻿namespace LendingPlatform
+﻿namespace LendingPlatform.LoanApplication
 {
     internal class LoanApplicationRequest
     {
@@ -11,7 +11,7 @@
             LoanAmount = loanAmount;
             AssetValue = assetValue;
             CreditScore = creditScore;
-            LoanToValuePercentage = (loanAmount / assetValue) * 100;
+            LoanToValuePercentage = loanAmount / assetValue * 100;
         }
 
         public decimal LoanAmount { get; }
