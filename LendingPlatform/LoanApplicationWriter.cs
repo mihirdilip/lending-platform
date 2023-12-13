@@ -1,4 +1,6 @@
-﻿namespace LendingPlatform
+﻿using Microsoft.Extensions.Logging;
+
+namespace LendingPlatform
 {
     internal interface ILoanApplicationWriter
     {
@@ -7,12 +9,14 @@
 
     internal class LoanApplicationWriterForConsole : ILoanApplicationWriter
     {
+        private readonly ILogger<LoanApplicationWriterForConsole> _logger;
         private readonly ILoanApplicationValidator _validator;
         private readonly ILoanApplicationRepository _applicationRepository;
         private readonly ILoanMetricsRepository _metricsRepository;
 
-        public LoanApplicationWriterForConsole(ILoanApplicationValidator validator, ILoanApplicationRepository applicationRepository, ILoanMetricsRepository metricsRepository)
+        public LoanApplicationWriterForConsole(ILogger<LoanApplicationWriterForConsole> logger, ILoanApplicationValidator validator, ILoanApplicationRepository applicationRepository, ILoanMetricsRepository metricsRepository)
         {
+            _logger = logger;
             _validator = validator;
             _applicationRepository = applicationRepository;
             _metricsRepository = metricsRepository;
@@ -34,11 +38,12 @@
             {
                 result.SetFailed(ex.Message, ex);
                 metricsSummary.TotalApplicationsDeclined++;
+                _logger.LogTrace(ex, ex.Message);
             }
             catch (Exception ex)
             {
                 result.SetFailed(ex.Message, ex);
-                Console.WriteLine("UNKNOWN ERROR: " + ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
 
             try
@@ -48,7 +53,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error when trying to save: " + ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
 
             Console.WriteLine(result.ToString());

@@ -1,5 +1,7 @@
-﻿
-using LendingPlatform;
+﻿using LendingPlatform;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 /*
  * Assuming that the input values will be of correct format. 
@@ -8,7 +10,6 @@ using LendingPlatform;
  * Assuming mean average Loan to Value metric is calculated only for successful applications.
  * Emulating persistence of loan applications and summary data by saving them to local json files.
  *      This can be SQL/NOSQL database in production.
- * We can introduce IoC and use dependency injections.
  * We can introduce pub-sub messaging of events to make things loosely coupled can scalable.
  *      Collection & reporting of metrics can be refactored to use this. 
  *      This can be in memory for now but can be over the network using Azure Service Bus or something similar.
@@ -20,28 +21,41 @@ using LendingPlatform;
  * Convert the console app into micro-service / rest api and host it on some cloud service like azure api app, AKS, depending on the requirements.
  */
 
-Console.WriteLine("Welcome to the Lending Platform!");
+var hostBuilder = Host.CreateApplicationBuilder(args);
 
-var loanWriter = new LoanApplicationWriterForConsole(
-    new DefaultLoanApplicationValidator(), 
-    new LoanApplicationJsonFileRepository(),
-    new LoanMetricsJsonFileRepository());
+hostBuilder.Services.AddSingleton<ILoanApplicationRepository, LoanApplicationJsonFileRepository>()
+                    .AddTransient<ILoanApplicationValidator, DefaultLoanApplicationValidator>()
+                    .AddTransient<ILoanApplicationWriter, LoanApplicationWriterForConsole>();
 
-while (true)
+hostBuilder.Services.AddSingleton<ILoanMetricsRepository, LoanMetricsJsonFileRepository>();
+
+using IHost host = hostBuilder.Build();
+await StartAppAsync(host.Services);
+await host.RunAsync();
+
+
+
+
+static async Task StartAppAsync(IServiceProvider services)
 {
-    Console.WriteLine();
-    Console.WriteLine("------------------------------------------");
+    var loanApplicationWriter = services.GetRequiredService<ILoanApplicationWriter>();
 
-    _ = await loanWriter.ApplyAsync(GetUserInput(), CancellationToken.None);
+    Console.WriteLine("Welcome to the Lending Platform!");
 
-    Console.WriteLine("------------------------------------------");
-    Console.WriteLine();
+    while (true)
+    {
+        Console.WriteLine();
+        Console.WriteLine("------------------------------------------");
+        _ = await loanApplicationWriter.ApplyAsync(GetUserInput(), CancellationToken.None);
+        Console.WriteLine("------------------------------------------");
+        Console.WriteLine();
 
-    Console.Write("Do you want to continue with next application? Press enter to default to Y. [Y/N]: ");
-    var key = Console.ReadKey();
-    Console.WriteLine();
-    if (key.Key == ConsoleKey.Escape || key.Key == ConsoleKey.N)
-        break;
+        Console.Write("Do you want to continue with next application? Press enter to default to Y. [Y/N]: ");
+        var key = Console.ReadKey();
+        Console.WriteLine();
+        if (key.Key == ConsoleKey.Escape || key.Key == ConsoleKey.N)
+            break;
+    }
 }
 
 static LoanApplicationRequest GetUserInput()

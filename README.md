@@ -6,7 +6,6 @@
 * Assuming mean average Loan to Value metric is calculated only for successful applications.
 * Emulating persistence of loan applications and summary data by saving them to local json files. 
     * This can be SQL/NOSQL database in production.
-* We can introduce IoC and use dependency injections.
 * We can introduce pub-sub messaging of events to make things loosely coupled can scalable. 
     * Collection & reporting of metrics can be refactored to use this. 
     * This can be in memory for now but can be over the network using Azure Service Bus or something similar.
@@ -40,6 +39,7 @@ Implemented minimal basic console app with business logic. Nothing fancy here.
     * `LoanApplicationJsonFileRepository` class implementing `ILoanApplicationRepository` interface and a supporting class `LoanApplicationResult`.
     * `LoanMetricsJsonFileRepository` class implementing `ILoanMetricsRepository` interface and a supporting class `LoanMetricsSummary`.
     * This can be SQL/NOSQL database in production.
+* Introduced IoC and using DI.
 
 -------------------------------------------------
 
