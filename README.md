@@ -16,6 +16,8 @@
 * Use Pull Requests and CI validations before merging into main branch.
 * Convert the console app into micro-service / rest api and host it on some cloud service like azure api app, AKS, depending on the requirements.
 
+Ended up spending over an hour for this task. I have split the progress in 4 phases below. Only 1st phase was possible just under an hour. Continued implementing further to demonstrate the iterations/improvments done over time.
+
 ## Phase 1
 [Phase 1 tag/branch](https://github.com/mihirdilip/lending-platform/tree/phase-1)
 
