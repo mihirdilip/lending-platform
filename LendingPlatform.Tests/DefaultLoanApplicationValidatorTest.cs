@@ -1,3 +1,5 @@
+using LendingPlatform.LoanApplication;
+
 namespace LendingPlatform.Tests
 {
     public class DefaultLoanApplicationValidatorTest
